@@ -1,130 +1,125 @@
 package org.example.database;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Properties;
-
-import org.example.models.User;
+import org.hibernate.query.Query;
+import org.example.models.*;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import java.util.List;
 
 
 public class DataBase {
-    private static String URL;
-    private static String USER;
-    private static String PASSWORD;
-    private static String DB_DRIVER_NAME;
-    private static Connection connection;
-    private static final String SQL_CREATE_USERS_DB = "CREATE TABLE IF NOT EXISTS users (" + "id SERIAL PRIMARY KEY, " + "name VARCHAR(100) NOT NULL, " + "operator VARCHAR(50) NOT NULL);";
+    private static DataBase db;
+    private static SessionFactory sessionFactory;
+    private DataBase() {
+        sessionFactory = new Configuration()
+                            .configure("hibernate.cfg.xml")
+                            .addAnnotatedClass(User.class)
+                            .addAnnotatedClass(Course.class)
+                            .addAnnotatedClass(Account.class)
+                            .buildSessionFactory();
+    }
 
-    private static final String SQL_CREATE_NUMBERS_PHONE_DB = "CREATE TABLE IF NOT EXISTS numbers_phone (" + "phone_number VARCHAR(18) UNIQUE, " + "user_id INTEGER);";
+    public static DataBase getDataBase() {
+        if(db == null) {
+            db = new DataBase();
+        }
+        return db;
+    }
 
-    public DataBase() {
-        try {
-            Properties properties = new Properties();
-            properties.load(new FileInputStream("src/main/resources/db.properties"));
+    public void addUser(User user, Account account) throws SQLException {
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+            session.save(user);
+            account.setUser(user);
+            session.save(account);
+            session.getTransaction().commit();
+        }
+    }
 
-            URL = properties.getProperty("db.url");
-            USER = properties.getProperty("db.user");
-            PASSWORD = properties.getProperty("db.password");
-            DB_DRIVER_NAME = properties.getProperty("db.driver.name");
+    public void addCourses(Account account, Course course) throws SQLException {
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
 
-            Class.forName(DB_DRIVER_NAME);
-            connection = DriverManager.getConnection(URL, USER, PASSWORD);
-            try (PreparedStatement pstmt1 = connection.prepareStatement(SQL_CREATE_USERS_DB); PreparedStatement pstmt2 = connection.prepareStatement(SQL_CREATE_NUMBERS_PHONE_DB)) {
-                pstmt1.executeUpdate();
-                pstmt2.executeUpdate();
+            Account existingAccount = session.createQuery("FROM Account WHERE login = :login", Account.class)
+                    .setParameter("login", account.getLogin())
+                    .uniqueResult();
+
+            if (existingAccount == null) {
+                throw new SQLException("Account not found with login: " + account.getLogin());
             }
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            existingAccount.getCourses().add(course);
+            session.save(existingAccount);
+            session.getTransaction().commit();
         } catch (Exception e) {
             e.printStackTrace();
+            throw new SQLException("Error adding course to account", e);
         }
     }
 
-    private void setUpId(User user) throws SQLException {
-        String sql = "SELECT id FROM users WHERE operator = ? AND name = ?";
-        try (PreparedStatement pstmt1 = connection.prepareStatement(sql)) {
-            pstmt1.setString(1, user.getOperator());
-            pstmt1.setString(2, user.getName());
-            ResultSet rs = pstmt1.executeQuery();
-            if (rs.next()) {
-                user.setId(rs.getInt(1));
-            }
-        }
-    }
-
-    public void addUser(User user) throws SQLException {
-        String sql = "INSERT INTO users (name, operator) VALUES (?, ?)";
-
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, user.getName());
-            pstmt.setString(2, user.getOperator());
-            pstmt.executeUpdate();
-            setUpId(user);
-        }
-
-        sql = "INSERT INTO numbers_phone (phone_number, user_id) VALUES (?, ?)";
-
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, user.getPhoneNumber());
-            pstmt.setInt(2, user.getId());
-            pstmt.executeUpdate();
-        }
-    }
-
-    public void updateUser(User user) throws SQLException {
-        setUpId(user);
-        String sql = "UPDATE numbers_phone SET phone_number = ? WHERE user_id = ?";
-        try (PreparedStatement pstmt1 = connection.prepareStatement(sql)) {
-            pstmt1.setString(1, user.getPhoneNumber());
-            pstmt1.setInt(2, user.getId());
-            pstmt1.executeUpdate();
-        }
-    }
+    // public void updateUser(User new_user, Phone phone) throws SQLException {
+    //     try (Session session = sessionFactory.openSession()) {
+    //         session.beginTransaction();
+    //         User user = getUserByName(new_user.getName());
+    //         user.setOperator(new_user.getOperator());
+    //         Phone ph = getPhoneByUserId(user.getId());
+    //         ph.setPhoneNumber(phone.getPhoneNumber());
+    //         session.update(user);
+    //         session.update(ph);
+    //         session.getTransaction().commit();
+    //     } catch (Exception e) {
+    //         throw new SQLException("Error getting user: " + e.getMessage(), e);
+    //     }
+    // }
 
     public void deleteUser(User user) throws SQLException {
-        String sql = "SELECT id FROM users JOIN numbers_phone ON users.id = numbers_phone.user_id WHERE operator = ? AND name = ? AND phone_number = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, user.getOperator());
-            pstmt.setString(2, user.getName());
-            pstmt.setString(3, user.getPhoneNumber());
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                sql = "DELETE FROM users WHERE id = ?";
-                try (PreparedStatement pstmt1 = connection.prepareStatement(sql)) {
-                    pstmt1.setInt(1, rs.getInt(1));
-                    pstmt1.executeUpdate();
-                }
-                sql = "DELETE FROM numbers_phone WHERE user_id = ?";
-                try (PreparedStatement pstmt1 = connection.prepareStatement(sql)) {
-                    pstmt1.setInt(1, rs.getInt(1));
-                    pstmt1.executeUpdate();
-                }
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+
+            User new_user = session.createQuery("FROM User WHERE account.login = :login", User.class)
+                    .setParameter("login", user.getAccount().getLogin())
+                    .uniqueResult();
+
+            if (new_user == null) {
+                throw new SQLException("User not found with login: " + user.getAccount().getLogin());
             }
+
+            session.delete(new_user);
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new SQLException("Error deleting user: " + e.getMessage(), e);
         }
     }
 
-    public ArrayList<User> viewUsers() throws SQLException {
-        String sql = "SELECT * FROM users JOIN numbers_phone ON users.id = numbers_phone.user_id";
+     public List<User> getAllUsers() throws SQLException {
+         try (Session session = sessionFactory.openSession()) {
+             Query<User> query = session.createQuery("FROM User", User.class);
+             return query.getResultList();
+         }
+     }
 
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            ArrayList<User> users = new ArrayList<>();
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    users.add(User.builder().name(rs.getString("name")).phoneNumber(rs.getString("phone_number")).operator(rs.getString("operator")).build());
-                }
-            }
-            return users;
-        }
-    }
+    // public User getUserByName(String name) throws SQLException {
+    //     try (Session session = sessionFactory.openSession()) {
+    //         Query<User> query = session.createQuery("FROM User WHERE name = :name", User.class);
+    //         query.setParameter("name", name);
+    //         return query.uniqueResult();
+    //     } catch (Exception e) {
+    //         throw new SQLException("Error getting user by name: " + e.getMessage());
+    //     }
+    // }
+    
+    
+    // public Phone getPhoneByUserId(Long user_id) throws SQLException {
+    //     try (Session session = sessionFactory.openSession()) {
+    //         Query<Phone> query = session.createQuery("FROM Phone WHERE user_id = :user_id", Phone.class);
+    //         query.setParameter("user_id", user_id);
+    //         return query.uniqueResult();
+    //     } catch (Exception e) {
+    //         throw new SQLException("Error getting phone by name: " + e.getMessage());
+    //     }
+    // }
 }

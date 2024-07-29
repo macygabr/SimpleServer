@@ -18,22 +18,16 @@ public class Main {
     public static void main(String[] args) {
         try {
             init();
-
             String appBase = ".";
             tomcat.getHost().setAppBase(appBase);
-
             Context context = tomcat.addWebapp("/", appBase);
-
             addHomeServlet(context);
             addUserServlet(context);
             deleteUserServlet(context);
             updateUserServlet(context);
             viewUsersServlet(context);
-
             tomcat.start();
             tomcat.getServer().await();
-        } catch (LifecycleException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
