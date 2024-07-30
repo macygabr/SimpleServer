@@ -14,51 +14,56 @@ import java.io.PrintWriter;
 
 @WebServlet("/update-user")
 public class UpdateUserServlet extends HttpServlet {
-    // private static final DataBase db = DataBase.getDataBase();
+     private static final DataBase db = DataBase.getDataBase();
 
-    // @Override
-    // protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    //     response.setContentType("text/html");
+     @Override
+     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+         response.setContentType("text/html");
 
-    //     PrintWriter out = response.getWriter();
-    //     out.println("<html><body>");
-    //     out.println("<h1>Update User</h1>");
-    //     out.println("<form method=\"post\">");
-    //     out.println("Name: <input type=\"text\" name=\"name\"><br>");
-    //     out.println("Phone Number: <input type=\"text\" name=\"phoneNumber\"><br>");
-    //     out.println("Operator: <input type=\"text\" name=\"operator\"><br>");
-    //     out.println("<input type=\"submit\" value=\"Submit\">");
-    //     out.println("</form>");
-    //     out.println("</body></html>");
-    // }
+         PrintWriter out = response.getWriter();
+         out.println("<html>");
+         out.println("<head>");
+         out.println("<title>Update User</title>");
+         out.println("</head>");
+         out.println("<body>");
+         out.println("<h1>Update User</h1>");
+         out.println("<form method=\"post\" action=\"/update-user\">");
 
-    // @Override
-    // protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    //    String name = request.getParameter("name");
-    //    String phoneNumber = request.getParameter("phoneNumber");
-    //    String operator = request.getParameter("operator");
-    //    Users user = new Users();
-    //    Phone phone = new Phone();
-    //    user.setName(name);
-    //    user.setOperator(operator);
-    //    phone.setPhoneNumber(phoneNumber);
+         // Form for User
+         out.println("Name: <input type=\"text\" name=\"name\" required><br>");
+         out.println("<fieldset>");
+         out.println("<legend>New User Information</legend>");
+         out.println("Login: <input type=\"text\" name=\"login\" required><br>");
+         out.println("Password: <input type=\"text\" name=\"pass\" required><br>");
+         out.println("<input type=\"submit\" name=\"action\" value=\"update\">");
+         out.println("</fieldset>");
 
-    //    response.setContentType("text/html");
-    //    PrintWriter out = response.getWriter();
+         out.println("</form>");
+         out.println("</body>");
+         out.println("</html>");
+     }
 
-    //    try {
-    //        db.updateUser(user, phone);
-    //        out.println("<html><body>");
-    //        out.println("<h1>User Updated Successfully</h1>");
-    //        out.println("<p>Name: " + name + "</p>");
-    //        out.println("<p>Phone Number: " + phoneNumber + "</p>");
-    //        out.println("<p>Operator: " + operator + "</p>");
-    //        out.println("</body></html>");
-    //    } catch (Exception e) {
-    //        out.println("<h1>User Updated Failed</h1>");
-    //        out.println("<p>" + e.getMessage() + "</p>");
-    //        out.println("</body></html>");
-    //        e.printStackTrace();
-    //    }
-    // }
+     @Override
+     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+         String name = request.getParameter("name");
+         String login = request.getParameter("login");
+         String pass = request.getParameter("pass");
+         User user = User.builder().name(name).build();
+         Account account = Account.builder().login(login).pass(pass).build();
+
+         PrintWriter out = response.getWriter();
+         response.setContentType("text/html");
+         try {
+             db.updateUser(user, account);
+             out.println("<html><body>");
+             out.println("<h1>User Update Successfully</h1>");
+             out.println("<p>Name: " + name + "</p>");
+             out.println("</body></html>");
+         } catch (Exception e) {
+             out.println("<h1>User Update Failed</h1>");
+             out.println("<p>" + e.getMessage() + "</p>");
+             out.println("</body></html>");
+             e.printStackTrace();
+         }
+     }
 }

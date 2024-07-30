@@ -29,7 +29,7 @@ public class DataBase {
         return db;
     }
 
-    public void addUser(User user, Account account) throws SQLException {
+    public void addUser(User user, Account account) {
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
             session.save(user);
@@ -60,31 +60,41 @@ public class DataBase {
         }
     }
 
-    // public void updateUser(User new_user, Phone phone) throws SQLException {
-    //     try (Session session = sessionFactory.openSession()) {
-    //         session.beginTransaction();
-    //         User user = getUserByName(new_user.getName());
-    //         user.setOperator(new_user.getOperator());
-    //         Phone ph = getPhoneByUserId(user.getId());
-    //         ph.setPhoneNumber(phone.getPhoneNumber());
-    //         session.update(user);
-    //         session.update(ph);
-    //         session.getTransaction().commit();
-    //     } catch (Exception e) {
-    //         throw new SQLException("Error getting user: " + e.getMessage(), e);
-    //     }
-    // }
+     public void updateUser(User user, Account new_account) throws SQLException {
+         try (Session session = sessionFactory.openSession()) {
+             User existingUser = session.createQuery("FROM User WHERE name = :name", User.class)
+                     .setParameter("name", user.getName())
+                     .uniqueResult();
+
+             if (existingUser == null) {
+                 throw new SQLException("User not found with name: " + user.getName());
+             }
+             Account existingAccount = existingUser.getAccount();
+             if (existingAccount == null) {
+                 throw new SQLException("Account not found for user with name: " + user.getName());
+             }
+             session.beginTransaction();
+             existingAccount.setLogin(new_account.getLogin());
+             existingAccount.setPass(new_account.getPass());
+             session.update(existingAccount);
+             existingUser.setAccount(existingAccount);
+             session.update(existingUser);
+             session.getTransaction().commit();
+         } catch (Exception e) {
+             throw new SQLException("Error updating user and account: " + e.getMessage(), e);
+         }
+     }
 
     public void deleteUser(User user) throws SQLException {
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
 
-            User new_user = session.createQuery("FROM User WHERE account.login = :login", User.class)
-                    .setParameter("login", user.getAccount().getLogin())
+            User new_user = session.createQuery("FROM User WHERE name = :name", User.class)
+                    .setParameter("name", user.getName())
                     .uniqueResult();
 
             if (new_user == null) {
-                throw new SQLException("User not found with login: " + user.getAccount().getLogin());
+                throw new SQLException("User not found with name: " + user.getName());
             }
 
             session.delete(new_user);
@@ -95,7 +105,7 @@ public class DataBase {
         }
     }
 
-     public List<User> getAllUsers() throws SQLException {
+     public List<User> getAllUsers() {
          try (Session session = sessionFactory.openSession()) {
              Query<User> query = session.createQuery("FROM User", User.class);
              return query.getResultList();

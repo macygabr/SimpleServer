@@ -21,11 +21,13 @@ public class Main {
             String appBase = ".";
             tomcat.getHost().setAppBase(appBase);
             Context context = tomcat.addWebapp("/", appBase);
+
             addHomeServlet(context);
             addUserServlet(context);
             deleteUserServlet(context);
             updateUserServlet(context);
             viewUsersServlet(context);
+
             tomcat.start();
             tomcat.getServer().await();
         } catch (Exception e) {
