@@ -1,7 +1,7 @@
 package org.example.database;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
+
 import org.hibernate.query.Query;
 import org.example.models.*;
 import org.hibernate.Session;
