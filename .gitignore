@@ -32,5 +32,5 @@ build/
 .DS_Store
 
 ### My list ###
-hibernate.cfg.xml
+src/main/resources/hibernate.cfg.xml
 bin
