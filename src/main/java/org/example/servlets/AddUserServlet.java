@@ -75,8 +75,10 @@ public class AddUserServlet extends HttpServlet {
         String name = request.getParameter("name");
         String login = request.getParameter("login");
         String pass = request.getParameter("pass");
-        User user = User.builder().name(name).build();
-        Account account = Account.builder().login(login).pass(pass).build();
+        User user = new User(name);
+//        PrimeAccount account = new PrimeAccount(login, pass);
+//        account.setBalance(199L);
+        Account account = new Account(login, pass);
 
         PrintWriter out = response.getWriter();
         response.setContentType("text/html");
@@ -100,8 +102,8 @@ public class AddUserServlet extends HttpServlet {
         String pass = request.getParameter("pass");
         String course_name = request.getParameter("course");
 
-        Account account = Account.builder().login(login).pass(pass).build();
-        Course course = Course.builder().name(course_name).build();
+        Account account = new Account(login, pass);
+        Course course = new Course(course_name);
 
         PrintWriter out = response.getWriter();
         response.setContentType("text/html");

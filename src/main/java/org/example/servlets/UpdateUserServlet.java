@@ -48,8 +48,8 @@ public class UpdateUserServlet extends HttpServlet {
          String name = request.getParameter("name");
          String login = request.getParameter("login");
          String pass = request.getParameter("pass");
-         User user = User.builder().name(name).build();
-         Account account = Account.builder().login(login).pass(pass).build();
+         User user = new User(name);
+         Account account = new Account(login,pass);
 
          PrintWriter out = response.getWriter();
          response.setContentType("text/html");

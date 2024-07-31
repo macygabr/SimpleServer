@@ -35,7 +35,7 @@ public class DeleteUserServlet extends HttpServlet {
      @Override
      protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String name = request.getParameter("name");
-        User user = User.builder().name(name).build();
+        User user = new User(name);
 
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();

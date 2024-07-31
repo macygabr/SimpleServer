@@ -105,31 +105,10 @@ public class DataBase {
         }
     }
 
-     public List<User> getAllUsers() {
-         try (Session session = sessionFactory.openSession()) {
-             Query<User> query = session.createQuery("FROM User", User.class);
-             return query.getResultList();
-         }
-     }
-
-    // public User getUserByName(String name) throws SQLException {
-    //     try (Session session = sessionFactory.openSession()) {
-    //         Query<User> query = session.createQuery("FROM User WHERE name = :name", User.class);
-    //         query.setParameter("name", name);
-    //         return query.uniqueResult();
-    //     } catch (Exception e) {
-    //         throw new SQLException("Error getting user by name: " + e.getMessage());
-    //     }
-    // }
-    
-    
-    // public Phone getPhoneByUserId(Long user_id) throws SQLException {
-    //     try (Session session = sessionFactory.openSession()) {
-    //         Query<Phone> query = session.createQuery("FROM Phone WHERE user_id = :user_id", Phone.class);
-    //         query.setParameter("user_id", user_id);
-    //         return query.uniqueResult();
-    //     } catch (Exception e) {
-    //         throw new SQLException("Error getting phone by name: " + e.getMessage());
-    //     }
-    // }
+    public List<User> getAllUsers() {
+        try (Session session = sessionFactory.openSession()) {
+            Query<User> query = session.createQuery("SELECT u FROM User u JOIN FETCH u.account a LEFT JOIN FETCH a.courses", User.class);
+            return query.getResultList();
+        }
+    }
 }

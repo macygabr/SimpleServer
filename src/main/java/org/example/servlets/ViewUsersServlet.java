@@ -45,6 +45,5 @@ public class ViewUsersServlet extends HttpServlet {
              out.println("</body></html>");
              e.printStackTrace();
         }
-
      }
 }
