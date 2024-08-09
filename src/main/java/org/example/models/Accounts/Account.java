@@ -3,7 +3,6 @@ package org.example.models.Accounts;
 import javax.persistence.*;
 
 import lombok.*;
-import org.example.dao.AccountDAO;
 
 @Entity
 @Getter
@@ -11,9 +10,16 @@ import org.example.dao.AccountDAO;
 @NoArgsConstructor
 @Table(name = "accounts")
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Account extends AccountDAO {
+public abstract class Account {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String login;
+    private String pass;
+
     public Account(String login, String pass) {
-        super(login, pass);
+        this.login = login;
+        this.pass = pass;
     }
 }
-
