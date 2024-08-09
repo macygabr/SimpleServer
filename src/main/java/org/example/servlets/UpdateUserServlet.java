@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.example.database.DataBase;
 import org.example.models.*;
+import org.example.models.Accounts.Account;
+import org.example.models.Accounts.SimpleAccount;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -49,7 +51,7 @@ public class UpdateUserServlet extends HttpServlet {
          String login = request.getParameter("login");
          String pass = request.getParameter("pass");
          User user = new User(name);
-         Account account = new Account(login,pass);
+         Account account = new SimpleAccount(login,pass);
 
          PrintWriter out = response.getWriter();
          response.setContentType("text/html");

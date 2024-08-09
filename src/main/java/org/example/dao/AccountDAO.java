@@ -1,9 +1,11 @@
-package org.example.models;
+package org.example.dao;
 
 import javax.persistence.*;
 
 
 import lombok.*;
+import org.example.models.Course;
+import org.example.models.User;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -1,19 +1,16 @@
-package org.example.models;
+package org.example.models.Accounts;
 
 import javax.persistence.*;
 
-
 import lombok.*;
-
-import java.util.HashSet;
-import java.util.Set;
+import org.example.dao.AccountDAO;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @Table(name = "accounts")
-public class Account extends AccountDAO {
+public abstract class Account extends AccountDAO {
     public Account(String login, String pass) {
         super(login, pass);
     }

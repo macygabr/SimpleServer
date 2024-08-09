@@ -1,6 +1,8 @@
-package org.example.models;
+package org.example.dao;
 
 import lombok.*;
+import org.example.models.Accounts.Account;
+
 import javax.persistence.*;
 
 @Getter

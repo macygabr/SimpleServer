@@ -2,6 +2,7 @@ package org.example.database;
 
 import java.sql.SQLException;
 
+import org.example.models.Accounts.Account;
 import org.hibernate.query.Query;
 import org.example.models.*;
 import org.hibernate.Session;

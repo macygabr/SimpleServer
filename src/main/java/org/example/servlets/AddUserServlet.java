@@ -9,9 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.example.database.DataBase;
 
 import org.example.models.*;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import java.util.List;
+import org.example.models.Accounts.Account;
+import org.example.models.Accounts.SimpleAccount;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -78,7 +77,7 @@ public class AddUserServlet extends HttpServlet {
         User user = new User(name);
 //        PrimeAccount account = new PrimeAccount(login, pass);
 //        account.setBalance(199L);
-        Account account = new Account(login, pass);
+        Account account = new SimpleAccount(login, pass);
 
         PrintWriter out = response.getWriter();
         response.setContentType("text/html");
@@ -102,7 +101,7 @@ public class AddUserServlet extends HttpServlet {
         String pass = request.getParameter("pass");
         String course_name = request.getParameter("course");
 
-        Account account = new Account(login, pass);
+        Account account = new SimpleAccount(login, pass);
         Course course = new Course(course_name);
 
         PrintWriter out = response.getWriter();

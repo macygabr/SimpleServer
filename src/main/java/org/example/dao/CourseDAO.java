@@ -1,6 +1,7 @@
-package org.example.models;
+package org.example.dao;
 
 import lombok.*;
+import org.example.models.Accounts.Account;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -24,7 +25,7 @@ public abstract class CourseDAO {
         this.name = name;
     }
 
-    @java.lang.Override
+    @Override
     public java.lang.String toString() {
         return name;
     }
