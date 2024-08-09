@@ -3,6 +3,7 @@ package org.example.database;
 import java.sql.SQLException;
 
 import org.example.models.Accounts.Account;
+import org.example.models.Accounts.PrimeAccount;
 import org.hibernate.query.Query;
 import org.example.models.*;
 import org.hibernate.Session;
@@ -30,7 +31,8 @@ public class DataBase {
         return db;
     }
 
-    public void addUser(User user, Account account) {
+    public void addUser(User user, Account account) throws SQLException {
+        if(account instanceof PrimeAccount) throw new SQLException("is PrimeAccount ");
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
             session.save(user);
@@ -70,6 +72,7 @@ public class DataBase {
              if (existingUser == null) {
                  throw new SQLException("User not found with name: " + user.getName());
              }
+
              Account existingAccount = existingUser.getAccount();
              if (existingAccount == null) {
                  throw new SQLException("Account not found for user with name: " + user.getName());

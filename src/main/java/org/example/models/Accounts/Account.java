@@ -10,6 +10,7 @@ import org.example.dao.AccountDAO;
 @Setter
 @NoArgsConstructor
 @Table(name = "accounts")
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Account extends AccountDAO {
     public Account(String login, String pass) {
         super(login, pass);

@@ -10,6 +10,7 @@ import org.example.database.DataBase;
 
 import org.example.models.*;
 import org.example.models.Accounts.Account;
+import org.example.models.Accounts.PrimeAccount;
 import org.example.models.Accounts.SimpleAccount;
 
 import java.io.IOException;
@@ -32,16 +33,17 @@ public class AddUserServlet extends HttpServlet {
         out.println("<h1>Add User and Course</h1>");
         out.println("<form method=\"post\" action=\"/add-user\">");
 
-        // Form for User
         out.println("<fieldset>");
         out.println("<legend>User Information</legend>");
         out.println("Name: <input type=\"text\" name=\"name\" required><br>");
         out.println("Login: <input type=\"text\" name=\"login\" required><br>");
         out.println("Password: <input type=\"text\" name=\"pass\" required><br>");
-        out.println("<input type=\"submit\" name=\"action\" value=\"addUser\">");
+
+        out.println("<input type=\"submit\" name=\"action\" value=\"addSimpleUser\">");
+        out.println("<input type=\"submit\" name=\"action\" value=\"addPrimeUser\">");
         out.println("</fieldset>");
 
-        // Form for Course
+
         out.println("<fieldset>");
         out.println("<legend>Course Information</legend>");
         out.println("Course: <input type=\"text\" name=\"course\"><br>");
@@ -52,6 +54,7 @@ public class AddUserServlet extends HttpServlet {
         out.println("</body>");
         out.println("</html>");
     }
+
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -75,9 +78,17 @@ public class AddUserServlet extends HttpServlet {
         String login = request.getParameter("login");
         String pass = request.getParameter("pass");
         User user = new User(name);
-//        PrimeAccount account = new PrimeAccount(login, pass);
-//        account.setBalance(199L);
-        Account account = new SimpleAccount(login, pass);
+
+        String action = request.getParameter("value");
+
+        Account account = null;
+        if("addSimpleUser".equals(action)){
+            account = new SimpleAccount(login, pass);
+        }
+        if("addPrimeUser".equals(action)){
+            account = new PrimeAccount(login, pass);
+            ((PrimeAccount) account).setBalance(1L);
+        }
 
         PrintWriter out = response.getWriter();
         response.setContentType("text/html");
