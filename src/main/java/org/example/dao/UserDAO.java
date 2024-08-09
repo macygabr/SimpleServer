@@ -17,7 +17,6 @@ public abstract class UserDAO {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Account account;
-
     private String name;
     protected UserDAO(String name){
         this.name = name;

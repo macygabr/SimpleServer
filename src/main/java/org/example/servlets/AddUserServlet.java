@@ -6,10 +6,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.example.dao.AccountDAO;
 import org.example.database.DataBase;
 
 import org.example.models.*;
-import org.example.models.Accounts.Account;
 import org.example.models.Accounts.PrimeAccount;
 import org.example.models.Accounts.SimpleAccount;
 
@@ -81,7 +81,7 @@ public class AddUserServlet extends HttpServlet {
 
         String action = request.getParameter("value");
 
-        Account account = null;
+        AccountDAO account = null;
         if("addSimpleUser".equals(action)){
             account = new SimpleAccount(login, pass);
         }
@@ -112,7 +112,7 @@ public class AddUserServlet extends HttpServlet {
         String pass = request.getParameter("pass");
         String course_name = request.getParameter("course");
 
-        Account account = new SimpleAccount(login, pass);
+        AccountDAO account = new SimpleAccount(login, pass);
         Course course = new Course(course_name);
 
         PrintWriter out = response.getWriter();

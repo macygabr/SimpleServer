@@ -1,7 +1,6 @@
 package org.example.dao;
 
 import lombok.*;
-import org.example.models.Accounts.Account;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -19,7 +18,7 @@ public abstract class CourseDAO {
     private String name;
 
     @ManyToMany(mappedBy = "courses")
-    private Set<Account> accounts = new HashSet<>();
+    private Set<AccountDAO> accounts = new HashSet<>();
 
     protected CourseDAO(String name) {
         this.name = name;

@@ -2,8 +2,8 @@ package org.example.database;
 
 import java.sql.SQLException;
 
-import org.example.models.Accounts.Account;
-import org.example.models.Accounts.PrimeAccount;
+import org.example.dao.AccountDAO;
+import org.example.models.Accounts.*;
 import org.hibernate.query.Query;
 import org.example.models.*;
 import org.hibernate.Session;
@@ -20,7 +20,8 @@ public class DataBase {
                             .configure("hibernate.cfg.xml")
                             .addAnnotatedClass(User.class)
                             .addAnnotatedClass(Course.class)
-                            .addAnnotatedClass(Account.class)
+                            .addAnnotatedClass(PrimeAccount.class)
+                            .addAnnotatedClass(SimpleAccount.class)
                             .buildSessionFactory();
     }
 
@@ -31,7 +32,7 @@ public class DataBase {
         return db;
     }
 
-    public void addUser(User user, Account account) throws SQLException {
+    public void addUser(User user, AccountDAO account) throws SQLException {
         if(account instanceof PrimeAccount) throw new SQLException("is PrimeAccount ");
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
@@ -42,11 +43,11 @@ public class DataBase {
         }
     }
 
-    public void addCourses(Account account, Course course) throws SQLException {
+    public void addCourses(AccountDAO account, Course course) throws SQLException {
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
 
-            Account existingAccount = session.createQuery("FROM Account WHERE login = :login", Account.class)
+            AccountDAO existingAccount = session.createQuery("FROM Account WHERE login = :login", AccountDAO.class)
                     .setParameter("login", account.getLogin())
                     .uniqueResult();
 
@@ -63,7 +64,7 @@ public class DataBase {
         }
     }
 
-     public void updateUser(User user, Account new_account) throws SQLException {
+     public void updateUser(User user, AccountDAO new_account) throws SQLException {
          try (Session session = sessionFactory.openSession()) {
              User existingUser = session.createQuery("FROM User WHERE name = :name", User.class)
                      .setParameter("name", user.getName())
@@ -73,7 +74,7 @@ public class DataBase {
                  throw new SQLException("User not found with name: " + user.getName());
              }
 
-             Account existingAccount = existingUser.getAccount();
+             AccountDAO existingAccount = existingUser.getAccount();
              if (existingAccount == null) {
                  throw new SQLException("Account not found for user with name: " + user.getName());
              }

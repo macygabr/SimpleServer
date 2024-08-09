@@ -6,9 +6,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.example.dao.AccountDAO;
 import org.example.database.DataBase;
 import org.example.models.*;
-import org.example.models.Accounts.Account;
 import org.example.models.Accounts.SimpleAccount;
 
 import java.io.IOException;
@@ -51,7 +51,7 @@ public class UpdateUserServlet extends HttpServlet {
          String login = request.getParameter("login");
          String pass = request.getParameter("pass");
          User user = new User(name);
-         Account account = new SimpleAccount(login,pass);
+         AccountDAO account = new SimpleAccount(login,pass);
 
          PrintWriter out = response.getWriter();
          response.setContentType("text/html");
